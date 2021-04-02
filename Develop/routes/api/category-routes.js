@@ -1,14 +1,14 @@
 const router = require('express').Router();
-const { Category, Product } = require('../../models');
+const { Category, Product, Tag } = require('../../models');
 
 // The `/api/categories` endpoint
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   // find all categories
   // be sure to include its associated Products
   try {
     const categoryRoute = await Category.findAll(
-      { include: [{ model: Product }] }
+      { include: [{ model: Product, through: Tag }] }
     );
     res.status(200).json(categoryRoute);
   } catch (err) {
@@ -16,12 +16,11 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
   try {
-    const categoryRoute = await Tag.findByPk(req.params.id, {
-      // JOIN with locations, using the Trip through table
+    const categoryRoute = await Category.findByPk(req.params.id, {
       include: [{ model: Category, through: Product, as: 'category_id', }]
     });
     if (!categoryRoute) {
@@ -34,7 +33,7 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // create a new category
   try {
     const categoryRoute = await Category.create(req.body);
@@ -44,7 +43,7 @@ router.post('/', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   try {
     const categoryRoute = await Category.update(req.body, {
@@ -62,7 +61,7 @@ router.put('/:id', (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   try {
     const categoryRoute = await Category.destroy({
