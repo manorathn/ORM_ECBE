@@ -22,7 +22,7 @@ router.get('/:id', (req, res) => {
   try {
     const tagRoute = await Tag.findByPk(req.params.id, {
       // JOIN with locations, using the Trip through table
-      include: [{ model: Product }]
+      include: [{ model: ProductTag, through: Product, as: 'product_tags', }]
     });
     if (!tagRoute) {
       res.status(404).json({ message: 'No Tags found with this ID!' });
@@ -61,7 +61,6 @@ router.put('/:id', (req, res) => {
     res.status(500).json(err);
   }
 });
-
 
 
 router.delete('/:id', (req, res) => {
